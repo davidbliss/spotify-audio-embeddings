@@ -10,7 +10,6 @@ from files import (
 	kmeans_song_load_order_path,
 	kmeans_path,
 	reduced_embeddings_path,
-  previews_dir,
 	db_path
 )
 import apsw
@@ -46,7 +45,6 @@ np.save(reduced_embeddings_path, reduced_embeddings)
 
 ## then, reduce to 6 dimensions for new functionality (tbd)
 reduced_embeddings_6 = PCA(n_components=6).fit_transform(vectors)
-audio_paths = list(previews_dir.glob("*.mp3"))
 
 conn.execute("""
   DROP TABLE IF EXISTS songs_vectors_6;
