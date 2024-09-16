@@ -33,24 +33,22 @@ conn.execute("""
 
 
 for i, n in enumerate(indices):
+  # build list of song ids that match the songs sorted by distance
   index_song_ids = [song_ids[i] for i in n]
+
   # some output for spot checking results
   this_id = song_ids[n[0]]
-  nearest_id = song_ids[n[1]]
-  furthest_id = song_ids[n[-1]]
-
+  nearest_id = index_song_ids[1]
+  furthest_id = index_song_ids[-1]
   nearest_distance = distances[i][1]
   furthest_distance = distances[i][-1]
 
   print("++++")
-  # print(index_song_ids)
   print(this_id)
   print(nearest_id, nearest_distance)
-  print(index_song_ids[1])
   print(furthest_id, furthest_distance)
-  print(index_song_ids[-1])
 
-  # Save the list if indices and distances under each songs ID
+  # save the list if indices and distances under each songs ID
   conn.execute("INSERT INTO song_distances VALUES (?, ?, ?);", (this_id, json.dumps(index_song_ids), json.dumps(distances[i].tolist())))
 
 
