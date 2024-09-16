@@ -10,9 +10,11 @@ from files import (
 	kmeans_song_load_order_path,
 	kmeans_path,
 	reduced_embeddings_path,
+  previews_dir,
 	db_path
 )
 import apsw
+from contextlib import closing
 
 conn = apsw.Connection(str(db_path))
 song_vectors_ids = list(conn.execute("SELECT rowid, song_id FROM songs_vectors;"))
@@ -28,6 +30,7 @@ vectors = np.asarray(
 	dtype=np.double
 )
 
+## first, reduce to 2 dimensions for original chart and playback (visualize.py)
 with genres_path.open() as f:
 	genres = json.load(f)
 
@@ -39,3 +42,18 @@ with open(kmeans_song_load_order_path, 'w') as f:
 
 sio.dump(kmeans, kmeans_path)
 np.save(reduced_embeddings_path, reduced_embeddings)
+
+
+## then, reduce to 6 dimensions for new functionality (tbd)
+reduced_embeddings_6 = PCA(n_components=6).fit_transform(vectors)
+audio_paths = list(previews_dir.glob("*.mp3"))
+
+conn.execute("""CREATE TABLE IF NOT EXISTS songs_vectors_6 (
+	song_id TEXT NOT NULL REFERENCES song(id),
+	embedding JSON NOT NULL
+);""")
+
+with closing(conn.cursor()) as cursor:
+    with conn:
+      for (file, embedding) in zip(audio_paths, reduced_embeddings_6):
+        cursor.execute("INSERT INTO songs_vectors_6 VALUES (?, ?);", (file.stem, (json.dumps((embedding.tolist())))))
