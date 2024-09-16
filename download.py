@@ -85,6 +85,7 @@ def genre_search(genre: str):
 		offset += songs['tracks']['total']
 
 genres = get_spotify_client().recommendation_genre_seeds()['genres']
+
 with open(genres_path, 'w') as f:
 	json.dump(genres, f)
 
@@ -117,10 +118,15 @@ print("Info download complete!")
 def download(song):
 	urlretrieve(song["preview_url"], previews_dir / f"{song['id']}.mp3")
 
-with Pool(8) as p:
-	songs = conn.execute("SELECT id, info -> '$.preview_url' as preview_url FROM songs;")
-	downloads = p.imap_unordered(download, (dict(id=song[0], preview_url=json.loads(song[1])) for song in songs))
-	for _ in tqdm(downloads, total=conn.execute("SELECT COUNT(*) AS count FROM songs;").fetchone()[0]):
-		pass
+songs = conn.execute("SELECT id, info -> '$.preview_url' as preview_url FROM songs;") 
+for song in songs:
+  print('downloading', song[1])
+  download(dict(id=song[0], preview_url=json.loads(song[1])))
+
+# with Pool(8) as p:
+# 	songs = conn.execute("SELECT id, info -> '$.preview_url' as preview_url FROM songs;")
+# 	downloads = p.imap_unordered(download, (dict(id=song[0], preview_url=json.loads(song[1])) for song in songs))
+# 	for _ in tqdm(downloads, total=conn.execute("SELECT COUNT(*) AS count FROM songs;").fetchone()[0]):
+# 		pass
 
 print("Preview download complete!")

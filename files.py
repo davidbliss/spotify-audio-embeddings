@@ -1,6 +1,6 @@
 from pathlib import Path
 
-BASE = Path("/media/kwilliams") / "Drive the Second" / "spotify-audio-embeddings"
+BASE = Path("/Users/davidbliss/github") / "spotify-audio-embeddings"
 
 previews_dir = BASE / "previews"
 previews_dir.mkdir(exist_ok=True)

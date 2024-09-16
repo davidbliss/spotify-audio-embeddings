@@ -35,7 +35,7 @@ WITH
 			songs,
 			json_each(songs.info, '$.artists') as artists
 		WHERE
-			songs.id = 'spotify:track:6Sq7ltF9Qa7SNFBsV5Cogx'
+			songs.id = ?
 	)
 SELECT
 	songs.id,
@@ -48,9 +48,9 @@ FROM
 LEFT JOIN
 	songs_genres ON songs.id = songs_genres.song_id
 WHERE
-	songs.id = 'spotify:track:6Sq7ltF9Qa7SNFBsV5Cogx';
+	songs.id = ?;
 """,
-		{'song_id': song_id}
+		(song_id, song_id)
 	).fetchone()
 	for song_id
 	in song_ids
@@ -102,8 +102,7 @@ def on_add(sel):
 	index = sel.index
 	region = kmeans.labels_[index]
 	song = songs[index]
-
-	text = f"""{song[1]!r} by {song[2]} ({song[0]})
+	text = f"""{song[1]!r} by {song[2]} | {song[3]}
 Region {region}
 """
 	sel.annotation.set_text(text)

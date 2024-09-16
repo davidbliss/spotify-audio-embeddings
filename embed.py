@@ -33,6 +33,7 @@ sound_files = (sf.read(audio_file) for audio_file in audio_paths)
 
 BATCH_SIZE = 16
 for i, sound_files in enumerate(ichunked(sound_files, BATCH_SIZE)):
+	print('round',i)
 	sound_files = list(sound_files)
 	audios = [sound_file[0] for sound_file in sound_files]
 	sample_rates = [sound_file[1] for sound_file in sound_files]
