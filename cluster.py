@@ -48,12 +48,15 @@ np.save(reduced_embeddings_path, reduced_embeddings)
 reduced_embeddings_6 = PCA(n_components=6).fit_transform(vectors)
 audio_paths = list(previews_dir.glob("*.mp3"))
 
-conn.execute("""CREATE TABLE IF NOT EXISTS songs_vectors_6 (
+conn.execute("""
+  DROP TABLE IF EXISTS songs_vectors_6;
+  
+  CREATE TABLE IF NOT EXISTS songs_vectors_6 (
 	song_id TEXT NOT NULL REFERENCES song(id),
 	embedding JSON NOT NULL
 );""")
 
 with closing(conn.cursor()) as cursor:
     with conn:
-      for (file, embedding) in zip(audio_paths, reduced_embeddings_6):
-        cursor.execute("INSERT INTO songs_vectors_6 VALUES (?, ?);", (file.stem, (json.dumps((embedding.tolist())))))
+      for (id, embedding) in zip(song_ids, reduced_embeddings_6):
+        cursor.execute("INSERT INTO songs_vectors_6 VALUES (?, ?);", (id, (json.dumps((embedding.tolist())))))
