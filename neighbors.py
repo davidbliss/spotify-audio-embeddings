@@ -5,10 +5,8 @@ from files import (
 )
 import apsw
 import json
-from contextlib import closing
 
 conn = apsw.Connection(str(db_path))
-
 
 # build a list of all embedings and a list of all ids
 
